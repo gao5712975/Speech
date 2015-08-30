@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/tarvel?tinyInt1isBit=false"/>
+        <property name="user" value="gaoyuan"/>
+        <property name="password" value="123456"/>
+        <!-- c3p0连接池配置 -->
+        <!-- 获取connnection时测试是否有效  -->
+        <property name="testConnectionOnCheckin" value="false"/>
+        <!-- 自动测试的table名称 -->
+        <property name="automaticTestTable" value="C3P0TestTable"/>
+        <!-- set to something much less than wait_timeout, prevents connections from going stale -->
+        <property name="idleConnectionTestPeriod" value="18000 "/>
+        <!-- set to something slightly less than wait_timeout, preventing 'stale' connections from being handed out -->
+        <property name="maxIdleTime" value="25000"/>
+        <!-- if you can take the performance 'hit', set to "true" -->
+        <property name="testConnectionOnCheckout" value="true"/>
+    </bean>
+</beans>

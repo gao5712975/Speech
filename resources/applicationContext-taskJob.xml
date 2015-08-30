@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!--&lt;!&ndash; 调度工厂 &ndash;&gt;-->
+    <!--<bean name="startQuertz" lazy-init="false" autowire="no"-->
+          <!--class="org.springframework.scheduling.quartz.SchedulerFactoryBean">-->
+        <!--<property name="triggers">-->
+            <!--<list>-->
+                <!--<ref bean="jobTrigger"/>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+    <!--&lt;!&ndash;调度任务 star&ndash;&gt;-->
+    <!--&lt;!&ndash; job的配置开始 &ndash;&gt;-->
+    <!--<bean id="jobDetail"-->
+          <!--class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">-->
+        <!--<property name="targetObject">-->
+            <!--<ref bean="taskJob" />-->
+        <!--</property>-->
+        <!--<property name="targetMethod">-->
+            <!--<value>dealListToMemberFunds</value>-->
+        <!--</property>-->
+    <!--</bean>-->
+    <!--&lt;!&ndash; job的配置结束 &ndash;&gt;-->
+    <!--<bean id="jobTrigger"-->
+          <!--class="org.springframework.scheduling.quartz.CronTriggerBean">-->
+        <!--<property name="jobDetail">-->
+            <!--<ref bean="jobDetail" />-->
+        <!--</property>-->
+        <!--<property name="cronExpression">-->
+            <!--<value>0 0 12 * * ?</value>-->
+            <!--&lt;!&ndash;<value>0/30 * * * * ?</value>&ndash;&gt;-->
+        <!--</property>-->
+    <!--</bean>-->
+    <!--<bean id="taskJob" class="com.infofuse.business.integral.taskJob.TaskJob"/>-->
+    <!--调度任务 end-->
+</beans>
