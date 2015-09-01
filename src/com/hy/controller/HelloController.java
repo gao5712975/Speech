@@ -1,51 +1,48 @@
 package com.hy.controller;
 
-import com.hy.jdbc.DateSource;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.okvoice.tts.HanEngine;
+import com.hy.model.SpeechVO;
+import com.okvoice.tts.TTSEngine;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Enumeration;
 
 @Controller
 @RequestMapping("admin")
 public class HelloController {
-	@RequestMapping(value = "get",method = RequestMethod.GET)
-	public void printWelcome(ModelMap model) {
-		System.out.println();
-		model.addAttribute("message", "Hello world!");
-		System.out.println(System.getProperty("java.home"));
-		DateSource dateSource = new DateSource();
-		ComboPooledDataSource cpds = dateSource.getDataSource();
-		try {
-			Connection connection = cpds.getConnection();
-			System.out.println(connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-//		HanEngine.speechSynthesis("Hello world!");
-	}
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String printWelcome(ModelMap model) {
+        model.addAttribute("message", "Hello world!");
+        return "hello";
+    }
 
 
-	/**
-	 * 修改语音合成配置
-	 * @param speed 语速
-	 * @param volume 音量
-	 * @param timbre 音色
-	 */
-	@RequestMapping(value = "speechConfig",method = RequestMethod.POST)
-	public void modifySpeechConfig(HttpServletRequest request){
-		System.out.println(request.getParameter("speed"));
-
-		System.out.println("ok");
+    /**
+     * 修改语音合成配置
+     *
+     * @param speed  语速
+     * @param volume 音量
+     * @param timbre 音色
+     */
+    @RequestMapping(value = "speechConfig")
+    public void modifySpeechConfig(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println(request.getParameter("speed"));
+        try {
+            Writer writer = response.getWriter();
+            writer.write("ok");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("ok");
 //		if(speed != null && speed.trim() != ""){
 //			HanEngine.getTtsEngine().setSpeed(Integer.valueOf(speed));
 //		}
@@ -55,14 +52,48 @@ public class HelloController {
 //		if(timbre != null && timbre.trim() != ""){
 //			HanEngine.getTtsEngine().setLangMode(findArrayIndex(HanEngine.getLangModeDesc(),timbre));
 //		}
-	}
+    }
 
-	public int findArrayIndex(String[] str, String timber) {
-		for (int i = 0, j = str.length; i < j; i++) {
-			if (str[i].equals(timber)) {
-				return i;
-			}
-		}
-		return 0;
-	}
+    @RequestMapping(value = "login")
+    public void login(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println(request.getParameter("user"));
+        TTSEngine engine = new TTSEngine();
+        engine.play("测试语音");
+        try {
+            Writer writer = response.getWriter();
+            writer.write("ok");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("ok");
+    }
+
+    /**
+     * 语音合成
+     */
+    @RequestMapping(value = "speechPlay")
+    public void speechPlay(HttpServletRequest request, HttpServletResponse response, @ModelAttribute() SpeechVO speechVO) {
+//        Map m = request.getParameterMap();
+//        String[] d = request.getParameterValues("string");
+//        String s = request.getParameter("string");
+        Enumeration ss = request.getParameterNames();
+        TTSEngine engine = new TTSEngine();
+        engine.play("13213213213213132132");
+        while (ss.hasMoreElements()) {
+            Object b = ss.nextElement();
+            System.out.println(b.toString());
+
+        }
+    }
+
+    public int findArrayIndex(String[] str, String timber) {
+        for (int i = 0, j = str.length; i < j; i++) {
+            if (str[i].equals(timber)) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }
