@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * 连接mysql返还Connection对象
+ * 杩炴帴mysql杩旇繕Connection瀵硅薄
  * Created by Yuan on 2015/8/29.
  */
 public class JDBCUtil {
@@ -33,5 +33,8 @@ public class JDBCUtil {
             e.printStackTrace();
         }
         return null;
+    }
+    public static void main(String[] args){
+        System.out.println(getConnection());
     }
 }

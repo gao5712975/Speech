@@ -1,12 +1,14 @@
 package com.okvoice.tts;
 
+import com.util.AppliactionContextHelper;
+
 public class TTSEngine {
     private static final String[] langModeDesc = new String[]{"普通话男声", "普通话女声", "粤语男声", "粤语女声", "英语男声", "英语女声", "中英混合男", "中英混合女声", "粤英混合男声", "粤英混合声"};
     private static NativeEngine engine = null;
 
     public TTSEngine() {
         if (engine == null) {
-            engine = new NativeEngine();
+            engine = (NativeEngine)AppliactionContextHelper.getBean("engine");
         }
         this.init();
     }

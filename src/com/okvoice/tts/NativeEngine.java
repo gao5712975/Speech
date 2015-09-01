@@ -7,7 +7,7 @@ public class NativeEngine {
     }
 
     public NativeEngine() {
-        System.load("");
+
     }
 
     public native int init();

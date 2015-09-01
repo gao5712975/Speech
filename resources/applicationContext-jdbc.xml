@@ -7,9 +7,9 @@
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3306/tarvel?tinyInt1isBit=false"/>
-        <property name="user" value="gaoyuan"/>
-        <property name="password" value="123456"/>
+        <property name="jdbcUrl" value="jdbc:mysql://192.168.2.241:1521/orcl250"/>
+        <property name="user" value="TPRISCAS"/>
+        <property name="password" value="TPRISCAS"/>
         <!-- c3p0连接池配置 -->
         <!-- 获取connnection时测试是否有效  -->
         <property name="testConnectionOnCheckin" value="false"/>
