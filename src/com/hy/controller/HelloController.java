@@ -1,5 +1,6 @@
 package com.hy.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.hy.model.SpeechVO;
 import com.okvoice.tts.TTSEngine;
 import org.springframework.stereotype.Controller;
@@ -27,9 +28,9 @@ public class HelloController {
     /**
      * 修改语音合成配置
      *
-     * @param speed  语速
-     * @param volume 音量
-     * @param timbre 音色
+//     * @param speed  语速
+//     * @param volume 音量
+//     * @param timbre 音色
      */
     @RequestMapping(value = "speechConfig")
     public void modifySpeechConfig(HttpServletRequest request, HttpServletResponse response) {
@@ -79,10 +80,11 @@ public class HelloController {
 //        String[] d = request.getParameterValues("string");
 //        String s = request.getParameter("string");
         Enumeration ss = request.getParameterNames();
-        TTSEngine engine = new TTSEngine();
-        engine.play("13213213213213132132");
+//        TTSEngine engine = new TTSEngine();
+//        engine.play("13213213213213132132");
         while (ss.hasMoreElements()) {
             Object b = ss.nextElement();
+//            JSONArray array = JSONArray.parseArray(b.toString());
             System.out.println(b.toString());
 
         }
