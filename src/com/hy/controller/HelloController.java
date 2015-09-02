@@ -1,8 +1,13 @@
 package com.hy.controller;
 
+<<<<<<< HEAD
 import com.alibaba.fastjson.JSON;
 import com.hy.model.Speech;
 import com.hy.service.BasicService;
+=======
+import com.alibaba.fastjson.JSONArray;
+import com.hy.model.SpeechVO;
+>>>>>>> 29e7de20a899e3a3b1ef3e0a0ba44ff797a6d40b
 import com.okvoice.tts.TTSEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,10 +36,17 @@ public class HelloController {
 
     /**
      * 修改语音合成配置
+<<<<<<< HEAD
      * <p>
      * //     * @param speed  语速
      * //     * @param volume 音量
      * //     * @param timbre 音色
+=======
+     *
+//     * @param speed  语速
+//     * @param volume 音量
+//     * @param timbre 音色
+>>>>>>> 29e7de20a899e3a3b1ef3e0a0ba44ff797a6d40b
      */
     @RequestMapping(value = "speechConfig")
     public void modifySpeechConfig(HttpServletRequest request, HttpServletResponse response) {
@@ -81,10 +93,19 @@ public class HelloController {
     @RequestMapping(value = "speechPlay")
     public void speechPlay(HttpServletRequest request, HttpServletResponse response) {
         Enumeration ss = request.getParameterNames();
+<<<<<<< HEAD
 //        System.out.println(DateSource.getDataSource());
         getEngine().play("1321321321321321");
 //        while (ss.hasMoreElements()) {
 //            Object b = ss.nextElement();
+=======
+//        TTSEngine engine = new TTSEngine();
+//        engine.play("13213213213213132132");
+        while (ss.hasMoreElements()) {
+            Object b = ss.nextElement();
+//            JSONArray array = JSONArray.parseArray(b.toString());
+            System.out.println(b.toString());
+>>>>>>> 29e7de20a899e3a3b1ef3e0a0ba44ff797a6d40b
 
 //        }
     }
