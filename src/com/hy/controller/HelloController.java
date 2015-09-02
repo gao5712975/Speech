@@ -20,6 +20,14 @@ import java.util.List;
 public class HelloController {
     @Autowired
     private BasicService basicService;
+    private TTSEngine engine = null;
+
+    public TTSEngine getEngine() {
+        if (engine == null) {
+            engine = new TTSEngine();
+        }
+        return engine;
+    }
 
     /**
      * 修改语音合成配置
@@ -74,8 +82,7 @@ public class HelloController {
     public void speechPlay(HttpServletRequest request, HttpServletResponse response) {
         Enumeration ss = request.getParameterNames();
 //        System.out.println(DateSource.getDataSource());
-        TTSEngine engine = new TTSEngine();
-        engine.play("1321321321321321");
+        getEngine().play("1321321321321321");
 //        while (ss.hasMoreElements()) {
 //            Object b = ss.nextElement();
 

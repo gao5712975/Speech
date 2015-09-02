@@ -3,12 +3,12 @@ package com.okvoice.tts;
 import java.awt.*;
 
 /**
- * ÓïÒôºÏ³ÉÈ«¾Ö¶ÔÏó
+ *
  * Created by Administrator on 15-8-27.
  */
 public class HanEngine {
     private static TTSEngine engine = null;
-        private static final String[] langModeDesc = new String[]{"ÆÕÍ¨»°ÄĞÉù", "ÆÕÍ¨»°Å®Éù", "ÔÁÓïÄĞÉù", "ÔÁÓïÅ®Éù", "Ó¢ÓïÄĞÉù", "Ó¢ÓïÅ®Éù", "ÖĞÓ¢»ìºÏÄĞ", "ÖĞÓ¢»ìºÏÅ®Éù", "ÔÁÓ¢»ìºÏÄĞÉù", "ÔÁÓ¢»ìºÏÉù"};
+    private static final String[] langModeDesc = new String[]{"æ™®é€šè¯ç”·å£°", "æ™®é€šè¯å¥³å£°", "ç²¤è¯­ç”·å£°", "ç²¤è¯­å¥³å£°", "è‹±è¯­ç”·å£°", "è‹±è¯­å¥³å£°", "ä¸­è‹±æ··åˆç”·", "ä¸­è‹±æ··åˆå¥³å£°", "ç²¤è‹±æ··åˆç”·å£°", "ç²¤è‹±æ··åˆå£°"};
 
     private static int timeJob = 0;
 
@@ -33,7 +33,7 @@ public class HanEngine {
         return langModeDesc;
     }
 
-    /*ÓïÒôºÏ³É*/
+
     public static void speechSynthesis(String text){
         int[] lang_mode = getTtsEngine().getSupportLang();
         for (int i = 0; i < lang_mode.length; ++i) {
