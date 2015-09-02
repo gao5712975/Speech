@@ -1,35 +1,32 @@
 package com.hy.controller;
 
-import com.hy.model.SpeechVO;
+import com.alibaba.fastjson.JSON;
+import com.hy.model.Speech;
+import com.hy.service.BasicService;
 import com.okvoice.tts.TTSEngine;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.List;
 
 @Controller
 @RequestMapping("admin")
 public class HelloController {
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String printWelcome(ModelMap model) {
-        model.addAttribute("message", "Hello world!");
-        return "hello";
-    }
-
+    @Autowired
+    private BasicService basicService;
 
     /**
      * 修改语音合成配置
-     *
-     * @param speed  语速
-     * @param volume 音量
-     * @param timbre 音色
+     * <p>
+     * //     * @param speed  语速
+     * //     * @param volume 音量
+     * //     * @param timbre 音色
      */
     @RequestMapping(value = "speechConfig")
     public void modifySpeechConfig(HttpServletRequest request, HttpServletResponse response) {
@@ -74,18 +71,15 @@ public class HelloController {
      * 语音合成
      */
     @RequestMapping(value = "speechPlay")
-    public void speechPlay(HttpServletRequest request, HttpServletResponse response, @ModelAttribute() SpeechVO speechVO) {
-//        Map m = request.getParameterMap();
-//        String[] d = request.getParameterValues("string");
-//        String s = request.getParameter("string");
+    public void speechPlay(HttpServletRequest request, HttpServletResponse response) {
         Enumeration ss = request.getParameterNames();
+//        System.out.println(DateSource.getDataSource());
         TTSEngine engine = new TTSEngine();
-        engine.play("13213213213213132132");
-        while (ss.hasMoreElements()) {
-            Object b = ss.nextElement();
-            System.out.println(b.toString());
+        engine.play("1321321321321321");
+//        while (ss.hasMoreElements()) {
+//            Object b = ss.nextElement();
 
-        }
+//        }
     }
 
     public int findArrayIndex(String[] str, String timber) {
@@ -95,5 +89,27 @@ public class HelloController {
             }
         }
         return 0;
+    }
+
+    /**
+     * 获得班次信息列表
+     *
+     * @param request
+     * @param response
+     */
+    @RequestMapping(value = "findDataList")
+    public void findSpeedList(HttpServletRequest request, HttpServletResponse response) {
+        String id = "";
+        List<Speech> list = basicService.find(id);
+        String json = JSON.toJSONString(list);
+        try {
+            response.setHeader("Content-Type", "text/html;charset=UTF-8");
+            Writer writer = response.getWriter();
+            writer.write(json);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

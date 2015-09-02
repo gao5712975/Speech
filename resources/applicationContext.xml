@@ -12,9 +12,9 @@
 
     <mvc:annotation-driven/>
     <context:annotation-config/>
-    <!--<context:component-scan base-package="com.tarvel.**.service"/>-->
-    <!--<context:component-scan base-package="com.tarvel.**.dao"/>-->
+    <context:component-scan base-package="com.hy.**.controller"/>
+    <context:component-scan base-package="com.hy.**.service"/>
+    <context:component-scan base-package="com.hy.**.dao"/>
 
-    <bean id="engine" class="com.okvoice.tts.NativeEngine"/>
     <bean id="appliactionContextHelper" class="com.util.AppliactionContextHelper"/>
 </beans>
