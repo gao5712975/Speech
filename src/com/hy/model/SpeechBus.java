@@ -1,17 +1,60 @@
 package com.hy.model;
 
-import java.io.Serializable;
-
-public class Speech implements Serializable {
-    private String id;
+public class SpeechBus {
     private String time;
+    private String id;
     private String carNumber;
     private String terminus;
     private String checkport;
     private String carType;
     private String carUnit;
+    private String speed;
+    private String volume;
+    private String timbre;
+    private String taskNumber;
+    private String aheadTime;
 
-    public Speech() {
+    public SpeechBus() {
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    public String getVolume() {
+        return volume;
+    }
+
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
+
+    public String getTimbre() {
+        return timbre;
+    }
+
+    public void setTimbre(String timbre) {
+        this.timbre = timbre;
+    }
+
+    public String getTaskNumber() {
+        return taskNumber;
+    }
+
+    public void setTaskNumber(String taskNumber) {
+        this.taskNumber = taskNumber;
+    }
+
+    public String getAheadTime() {
+        return aheadTime;
+    }
+
+    public void setAheadTime(String aheadTime) {
+        this.aheadTime = aheadTime;
     }
 
     public String getId() {

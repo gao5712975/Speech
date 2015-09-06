@@ -9,12 +9,12 @@ import org.springframework.context.ApplicationContextAware;
  * spring配置文件实例
  * Created by Yuan on 2015/8/30.
  */
-public class AppliactionContextHelper implements ApplicationContextAware {
+public class ApplicationContextHelper implements ApplicationContextAware {
     private static ApplicationContext applicationContext;     //Spring应用上下文环境
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        AppliactionContextHelper.applicationContext = applicationContext;
+        ApplicationContextHelper.applicationContext = applicationContext;
     }
 
     public static ApplicationContext getApplicationContext() {

@@ -2,8 +2,11 @@ package com.okvoice.tts;
 
 public class NativeEngine {
     static {
-        System.loadLibrary("libokvtts");
-        System.loadLibrary("okvtts4j");
+        System.out.println(System.getProperty("user.dir"));
+        System.load(System.getProperty("user.dir") + "\\libokvtts.dll");
+        System.load(System.getProperty("user.dir") + "\\okvtts4j.dll");
+//        System.loadLibrary("libokvtts");
+//        System.loadLibrary("okvtts4j");
     }
 
     public NativeEngine() {

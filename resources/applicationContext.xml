@@ -16,9 +16,6 @@
     <context:component-scan base-package="com.hy.**.service"/>
     <context:component-scan base-package="com.hy.**.dao"/>
 
-<<<<<<< HEAD
-=======
-    <!--<bean id="engine" class="com.okvoice.tts.NativeEngine"/>-->
->>>>>>> 29e7de20a899e3a3b1ef3e0a0ba44ff797a6d40b
-    <bean id="appliactionContextHelper" class="com.util.AppliactionContextHelper"/>
+    <bean id="engine" class="com.okvoice.tts.TTSEngine"/>
+    <bean id="applicationContext" class="com.util.ApplicationContextHelper"/>
 </beans>
