@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("admin")
 public class SpeechsController {
-    private static final String[] langModeDesc = new String[]{"��ͨ������", "��ͨ��Ů��", "��������", "����Ů��", "Ӣ������", "Ӣ��Ů��", "��Ӣ�����", "��Ӣ���Ů��", "��Ӣ�������", "��Ӣ�����"};
+    private static final String[] langModeDesc = new String[]{"普通话男声", "普通话女声", "粤语男声", "粤语女声", "英语男声", "英语女声", "中英混合男", "中英混合女声", "粤英混合男声", "粤英混合声"};
     @Autowired
     private BasicService basicService;
     private TTSEngine engine = null;
