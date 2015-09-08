@@ -1,10 +1,12 @@
 package com.hy.controller;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hy.model.SpeechBus;
 import com.hy.service.BasicService;
 import com.okvoice.tts.TTSEngine;
 import com.util.ApplicationContextHelper;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -25,12 +27,13 @@ public class SpeechsController {
     private BasicService basicService;
     private TTSEngine engine = null;
     private TTSEngine engineProxy = null;
+    private int status = 0;
 
     public SpeechsController() {
     }
 
     public TTSEngine getEngine() {
-        if(this.engine == null) {
+        if (this.engine == null) {
             this.engine = (TTSEngine) ApplicationContextHelper.getBean("engine");
         }
 
@@ -39,15 +42,15 @@ public class SpeechsController {
 
     @RequestMapping({"speechConfig"})
     public void modifySpeechConfig(@RequestParam("speed") String speed, @RequestParam("volume") String volume, @RequestParam("timbre") String timbre, HttpServletResponse response) {
-        if(speed != null && "".equals(speed.trim())) {
+        if (speed != null && "".equals(speed.trim())) {
             this.getEngine().setSpeed(Integer.valueOf(speed).intValue());
         }
 
-        if(volume != null && "".equals(volume.trim())) {
+        if (volume != null && "".equals(volume.trim())) {
             this.getEngine().setVolume(Integer.valueOf(volume).intValue());
         }
 
-        if(timbre != null && "".equals(timbre.trim())) {
+        if (timbre != null && "".equals(timbre.trim())) {
             this.getEngine().setLangMode(this.findArrayIndex(langModeDesc, timbre));
         }
 
@@ -78,7 +81,7 @@ public class SpeechsController {
     @RequestMapping("speechPlay")
     public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech) {
         try {
-            if(this.engineProxy == null) {
+            if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
             }
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
@@ -87,7 +90,7 @@ public class SpeechsController {
             int a = this.engineProxy.play(speech);
             this.engineProxy = null;
             System.out.println(a);
-            result.put("status", Integer.valueOf(a));
+            result.put("status", a);
             e.write(result.toJSONString());
             e.flush();
             e.close();
@@ -99,27 +102,37 @@ public class SpeechsController {
 
     @RequestMapping("stop")
     public void speechStop() {
-        if(this.engineProxy != null) {
+        if (this.engineProxy != null) {
             System.out.println(this.engineProxy.stop());
+            status = 1;
             this.engineProxy = null;
         }
-
     }
 
     @RequestMapping("play")
-    public void play(@ModelAttribute SpeechBus speechBus, HttpServletRequest request, HttpServletResponse response) {
+    public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
         try {
-            System.out.println("进来了");
+            System.out.println("OK");
+            status = 0;
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
-            if(this.engineProxy != null) {
-                String task = speechBus.getTime() + speechBus.getCarNumber() + speechBus.getTerminus() + speechBus.getCarUnit();
-
-                for(int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
-                    System.out.println(this.engineProxy.play(task));
+            if (this.engineProxy != null) {
+                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
+                if(speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())){
+                    task = speechBus.getRulePlay();
+                    System.out.println(task);
+                }
+                for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
+                    if (engineProxy != null) {
+                        this.engineProxy.play(task);
+                    } else {
+                        break;
+                    }
                 }
                 JSONObject var8 = new JSONObject();
+
                 var8.put("id", speechBus.getId());
+                var8.put("status", status);
                 e.write(var8.toJSONString());
                 e.flush();
                 e.close();
@@ -132,9 +145,51 @@ public class SpeechsController {
 
     }
 
+    public String numberOfString(String number) {
+        String[] s = number.split("");
+        String nu = "";
+        for (int i = 0, j = s.length; i < j; i++) {
+            switch (s[i]) {
+                case "0":
+                    nu += "零";
+                    break;
+                case "1":
+                    nu += "一";
+                    break;
+                case "2":
+                    nu += "二";
+                    break;
+                case "3":
+                    nu += "三";
+                    break;
+                case "4":
+                    nu += "四";
+                    break;
+                case "5":
+                    nu += "五";
+                    break;
+                case "6":
+                    nu += "六";
+                    break;
+                case "7":
+                    nu += "七";
+                    break;
+                case "8":
+                    nu += "八";
+                    break;
+                case "9":
+                    nu += "九";
+                    break;
+                default:
+                    break;
+            }
+        }
+        return nu;
+    }
+
     @RequestMapping("initEngineProxy")
     public void initEngineProxy(@RequestParam("type") String type, HttpServletResponse response) {
-        if(this.engineProxy == null) {
+        if (this.engineProxy == null) {
             this.engineProxy = this.getEngine();
         }
 
@@ -179,8 +234,8 @@ public class SpeechsController {
     public int findArrayIndex(String[] str, String timber) {
         int i = 0;
 
-        for(int j = str.length; i < j; ++i) {
-            if(str[i].equals(timber)) {
+        for (int j = str.length; i < j; ++i) {
+            if (str[i].equals(timber)) {
                 return i;
             }
         }

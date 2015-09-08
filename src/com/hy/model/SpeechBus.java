@@ -13,6 +13,15 @@ public class SpeechBus {
     private String timbre;
     private String taskNumber;
     private String aheadTime;
+    private String rulePlay;
+
+    public String getRulePlay() {
+        return rulePlay;
+    }
+
+    public void setRulePlay(String rulePlay) {
+        this.rulePlay = rulePlay;
+    }
 
     public SpeechBus() {
     }
