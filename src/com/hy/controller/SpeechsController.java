@@ -118,7 +118,7 @@ public class SpeechsController {
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
                 String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
-                if(speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())){
+                if (speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())) {
                     task = speechBus.getRulePlay();
                     System.out.println(task);
                 }
@@ -181,6 +181,7 @@ public class SpeechsController {
                     nu += "九";
                     break;
                 default:
+                    nu += s[i];
                     break;
             }
         }
@@ -219,7 +220,6 @@ public class SpeechsController {
 //            } else {
             List list = this.basicService.find(id);
             json = JSON.toJSONString(list);
-            response.setStatus(200);
 //            }
 
             e.write(json);
@@ -228,7 +228,6 @@ public class SpeechsController {
         } catch (IOException var7) {
             var7.printStackTrace();
         }
-
     }
 
     public int findArrayIndex(String[] str, String timber) {
