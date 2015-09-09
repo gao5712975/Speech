@@ -112,12 +112,13 @@ public class SpeechsController {
     @RequestMapping("play")
     public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
         try {
-            System.out.println("OK");
             status = 0;
+            System.out.println("开始");
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
-                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
+                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + speechBus.getCarNumber() + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
+                System.out.println(task);
                 if (speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())) {
                     task = speechBus.getRulePlay();
                     System.out.println(task);
@@ -130,7 +131,7 @@ public class SpeechsController {
                     }
                 }
                 JSONObject var8 = new JSONObject();
-
+                System.out.println("完毕");
                 var8.put("id", speechBus.getId());
                 var8.put("status", status);
                 e.write(var8.toJSONString());
@@ -146,38 +147,38 @@ public class SpeechsController {
     }
 
     public String numberOfString(String number) {
-        String[] s = number.split("");
+        char[] s = number.toCharArray();
         String nu = "";
         for (int i = 0, j = s.length; i < j; i++) {
             switch (s[i]) {
-                case "0":
+                case 0:
                     nu += "零";
                     break;
-                case "1":
+                case 1:
                     nu += "一";
                     break;
-                case "2":
+                case 2:
                     nu += "二";
                     break;
-                case "3":
+                case 3:
                     nu += "三";
                     break;
-                case "4":
+                case 4:
                     nu += "四";
                     break;
-                case "5":
+                case 5:
                     nu += "五";
                     break;
-                case "6":
+                case 6:
                     nu += "六";
                     break;
-                case "7":
+                case 7:
                     nu += "七";
                     break;
-                case "8":
+                case 8:
                     nu += "八";
                     break;
-                case "9":
+                case 9:
                     nu += "九";
                     break;
                 default:
