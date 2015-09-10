@@ -101,12 +101,25 @@ public class SpeechsController {
     }
 
     @RequestMapping("stop")
-    public void speechStop() {
-        if (this.engineProxy != null) {
-            System.out.println(this.engineProxy.stop());
-            status = 1;
-            this.engineProxy = null;
+    public void speechStop(HttpServletResponse response) {
+        try {
+            PrintWriter e = response.getWriter();
+            if (this.engineProxy != null) {
+                System.out.println(this.engineProxy.stop());
+                status = 1;
+                this.engineProxy = null;
+                e.write("任务结束");
+                e.flush();
+                e.close();
+            }else{
+                e.write("没有任务");
+                e.flush();
+                e.close();
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
+
     }
 
     @RequestMapping("play")
