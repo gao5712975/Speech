@@ -84,13 +84,14 @@ public class SpeechsController {
             if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
             }
+            status = 2;//播放状态
+            this.engineProxy.stop();
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             JSONObject result = new JSONObject();
             int a = this.engineProxy.play(speech);
-            this.engineProxy = null;
             System.out.println(a);
-            result.put("status", a);
+            result.put("status", status);
             e.write(result.toJSONString());
             e.flush();
             e.close();
@@ -130,7 +131,7 @@ public class SpeechsController {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
-                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + speechBus.getCarNumber() + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
+                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
                 System.out.println(task);
                 if (speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())) {
                     task = speechBus.getRulePlay();
