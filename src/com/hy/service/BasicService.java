@@ -1,3 +1,4 @@
+
 package com.hy.service;
 
 import com.hy.dao.BasicDao;
@@ -18,4 +19,9 @@ public class BasicService {
     public List<Speech> find(String id){
         return basicDao.find(id);
     }
+
+    public String login(String user,String password){
+        return basicDao.login(user,password);
+    }
 }
+

@@ -2,6 +2,8 @@ package com.hy.dao;
 
 import com.hy.model.Speech;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.yxd.akframe.util.encrypt.TripleDes;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,9 +42,9 @@ public class BasicDao {
         String sql = "select * from v_boyin_keyunzhan where 1=1 ";
 //        company_id = 'f9a8fa794de86ecb014df0cf3b43065c'
 
-//        if (id != null && id.trim() != "") {
-//            sql += " and company_id = '" + id + "' ";
-//        }
+        if (id != null && id.trim() != "") {
+            sql += " and company_id = '"+ id +"'";
+        }
 
         try {
             Connection con = this.getConnection();
@@ -69,5 +71,28 @@ public class BasicDao {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public String login(String user,String password){
+        System.out.println(user);
+        String sql = "select company_id ID from t_akf_member where 1=1 ";
+        sql += "and  login_name='"+ user+"' and login_password='"+ TripleDes.encrypt(password, null)+"'";
+        String id = "";
+        System.out.println(sql);
+        try{
+            Connection con = this.getConnection();
+            PreparedStatement pre = con.prepareStatement(sql);
+            System.out.println(TripleDes.decrypt("E24F6954DC441B34", null));
+            System.out.println(TripleDes.encrypt(password, null));
+            ResultSet result = pre.executeQuery();
+            while (result.next()) {
+                id = result.getString("ID");
+                System.out.println("id:"+id);
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
+        return id;
     }
 }

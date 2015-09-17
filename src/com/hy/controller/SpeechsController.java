@@ -27,7 +27,7 @@ public class SpeechsController {
     private BasicService basicService;
     private TTSEngine engine = null;
     private TTSEngine engineProxy = null;
-    private int status = 0;
+    private int status = -1; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
 
     public SpeechsController() {
     }
@@ -56,7 +56,7 @@ public class SpeechsController {
 
         try {
             PrintWriter e = response.getWriter();
-            e.write("ok");
+            e.write("01");
             e.flush();
             e.close();
         } catch (IOException var6) {
@@ -66,12 +66,21 @@ public class SpeechsController {
     }
 
     @RequestMapping({"login"})
-    public void login(HttpServletRequest request, HttpServletResponse response) {
+    public void login(HttpServletRequest request, HttpServletResponse response, @RequestParam("user") String user, @RequestParam("password") String password) {
         try {
+            String id = basicService.login(user,password);
+            System.out.println(id);
             PrintWriter e = response.getWriter();
-            e.write("ok");
-            e.flush();
-            e.close();
+            if("" == id){
+                e.write("error");
+                e.flush();
+                e.close();
+            }else{
+                e.write(id);
+                e.flush();
+                e.close();
+            }
+
         } catch (IOException var4) {
             var4.printStackTrace();
         }
@@ -84,7 +93,13 @@ public class SpeechsController {
             if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
             }
-            status = 2;//播放状态
+            //播放状态
+            if(status == 1){
+                status = 1;
+            }
+            if(status == 0){
+                status = 2;
+            }
             this.engineProxy.stop();
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
@@ -102,7 +117,7 @@ public class SpeechsController {
     }
 
     @RequestMapping("stop")
-    public void speechStop(HttpServletResponse response) {
+    public void stop(HttpServletResponse response) {
         try {
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
@@ -131,7 +146,7 @@ public class SpeechsController {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
-                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
+                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + this.numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
                 System.out.println(task);
                 if (speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())) {
                     task = speechBus.getRulePlay();
@@ -165,34 +180,34 @@ public class SpeechsController {
         String nu = "";
         for (int i = 0, j = s.length; i < j; i++) {
             switch (s[i]) {
-                case 0:
+                case '0':
                     nu += "零";
                     break;
-                case 1:
+                case '1':
                     nu += "一";
                     break;
-                case 2:
+                case '2':
                     nu += "二";
                     break;
-                case 3:
+                case '3':
                     nu += "三";
                     break;
-                case 4:
+                case '4':
                     nu += "四";
                     break;
-                case 5:
+                case '5':
                     nu += "五";
                     break;
-                case 6:
+                case '6':
                     nu += "六";
                     break;
-                case 7:
+                case '7':
                     nu += "七";
                     break;
-                case 8:
+                case '8':
                     nu += "八";
                     break;
-                case 9:
+                case '9':
                     nu += "九";
                     break;
                 default:
@@ -228,18 +243,19 @@ public class SpeechsController {
         try {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
+            System.out.println("id:"+id);
             String json;
-//            if(id == null && "".equals(id)) {
-//                response.setStatus(405);
-//                json = "����д�����ȨID";
-//            } else {
-            List list = this.basicService.find(id);
-            json = JSON.toJSONString(list);
-//            }
-
-            e.write(json);
-            e.flush();
-            e.close();
+            if(id == null || "".equals(id)) {
+                e.write("02");
+                e.flush();
+                e.close();
+            } else {
+                List list = this.basicService.find(id);
+                json = JSON.toJSONString(list);
+                e.write(json);
+                e.flush();
+                e.close();
+            }
         } catch (IOException var7) {
             var7.printStackTrace();
         }
@@ -253,7 +269,6 @@ public class SpeechsController {
                 return i;
             }
         }
-
         return 0;
     }
 }
