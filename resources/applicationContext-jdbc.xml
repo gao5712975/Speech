@@ -6,20 +6,35 @@
        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+        <!--<property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
         <property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.2.241:1521:orcl250"/>
         <property name="user" value="TPRISCAS"/>
-        <property name="password" value="TPRISCAS"/>
-        <!--&lt;!&ndash; c3p0连接池配置 &ndash;&gt;-->
-        <!--&lt;!&ndash; 获取connnection时测试是否有效  &ndash;&gt;-->
-        <!--<property name="testConnectionOnCheckin" value="false"/>-->
-        <!--&lt;!&ndash; 自动测试的table名称 &ndash;&gt;-->
-        <!--<property name="automaticTestTable" value="C3P0TestTable"/>-->
-        <!--&lt;!&ndash; set to something much less than wait_timeout, prevents connections from going stale &ndash;&gt;-->
+        <property name="password" value="TPRISCAS"/>-->
+        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.1.204:1521:orcl"/>
+        <property name="user" value="priscom"/>
+        <property name="password" value="priscom"/>
+        <!-- c3p0连接池配置 -->
+        <!-- 获取connnection时测试是否有效  -->
+        <property name="testConnectionOnCheckin" value="false"/>
+        <!-- 自动测试的table名称 -->
+        <property name="automaticTestTable" value="C3P0TestTable"/>
+        <!-- set to something much less than wait_timeout, prevents connections from going stale -->
         <!--<property name="idleConnectionTestPeriod" value="18000 "/>-->
-        <!--&lt;!&ndash; set to something slightly less than wait_timeout, preventing 'stale' connections from being handed out &ndash;&gt;-->
+        <!-- set to something slightly less than wait_timeout, preventing 'stale' connections from being handed out -->
         <!--<property name="maxIdleTime" value="25000"/>-->
-        <!--&lt;!&ndash; if you can take the performance 'hit', set to "true" &ndash;&gt;-->
+        <!-- if you can take the performance 'hit', set to "true" -->
         <!--<property name="testConnectionOnCheckout" value="true"/>-->
+
+        <property name="minPoolSize" value="1"/>
+        <property name="maxPoolSize" value="50"/>
+        <property name="maxIdleTime" value="1800"/>
+        <property name="acquireIncrement" value="2"/>
+        <property name="maxStatements" value="0"/>
+        <property name="initialPoolSize" value="5"/>
+        <property name="idleConnectionTestPeriod" value="1800"/>
+        <property name="acquireRetryAttempts" value="30"/>
+        <property name="breakAfterAcquireFailure" value="true"/>
+        <property name="testConnectionOnCheckout" value="false"/>
     </bean>
 </beans>

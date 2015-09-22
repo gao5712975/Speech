@@ -6,18 +6,17 @@ import com.hy.model.SpeechBus;
 import com.hy.service.BasicService;
 import com.okvoice.tts.TTSEngine;
 import com.util.ApplicationContextHelper;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 
 @Controller
 @RequestMapping("admin")
@@ -65,24 +64,38 @@ public class SpeechsController {
 
     }
 
-    @RequestMapping({"login"})
+    @RequestMapping("login")
     public void login(HttpServletRequest request, HttpServletResponse response, @RequestParam("user") String user, @RequestParam("password") String password) {
+        PrintWriter pw;
+        JSONObject result = new JSONObject();
         try {
-            String id = basicService.login(user,password);
+            String id = basicService.login(user, password);
             System.out.println(id);
-            PrintWriter e = response.getWriter();
-            if("" == id){
-                e.write("error");
-                e.flush();
-                e.close();
-            }else{
-                e.write(id);
-                e.flush();
-                e.close();
+            pw = response.getWriter();
+            if ("".equals(id)) {
+                result.put("status", "00");
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
+            } else {
+                result.put("status", "01");
+                result.put("id", id);
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
             }
 
-        } catch (IOException var4) {
-            var4.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                pw = response.getWriter();
+                result.put("status", "02");
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
 
     }
@@ -94,10 +107,10 @@ public class SpeechsController {
                 this.engineProxy = this.getEngine();
             }
             //播放状态
-            if(status == 1){
+            if (status == -1) {
                 status = 1;
             }
-            if(status == 0){
+            if (status == 0) {
                 status = 2;
             }
             this.engineProxy.stop();
@@ -122,12 +135,12 @@ public class SpeechsController {
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
                 System.out.println(this.engineProxy.stop());
-                status = 1;
+                status = -1;
                 this.engineProxy = null;
                 e.write("任务结束");
                 e.flush();
                 e.close();
-            }else{
+            } else {
                 e.write("没有任务");
                 e.flush();
                 e.close();
@@ -240,24 +253,38 @@ public class SpeechsController {
 
     @RequestMapping({"findDataList"})
     public void findSpeedList(HttpServletRequest request, HttpServletResponse response, @RequestParam("id") String id) {
+        PrintWriter pw;
+        JSONObject result = new JSONObject();
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
         try {
-            response.setHeader("Content-Type", "text/html;charset=UTF-8");
-            PrintWriter e = response.getWriter();
-            System.out.println("id:"+id);
+            pw = response.getWriter();
+            System.out.println("id:" + id);
             String json;
-            if(id == null || "".equals(id)) {
-                e.write("02");
-                e.flush();
-                e.close();
+            if (id == null || "".equals(id)) {
+                result.put("status", "00");//没有登录，或者用户没有车站信息
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
             } else {
                 List list = this.basicService.find(id);
                 json = JSON.toJSONString(list);
-                e.write(json);
-                e.flush();
-                e.close();
+                result.put("status", "01");//正确结果
+                result.put("result", json);
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
             }
-        } catch (IOException var7) {
-            var7.printStackTrace();
+        } catch (Exception e) {
+            try {
+                pw = response.getWriter();
+                result.put("status", "02");//系统错误
+                pw.write(JSON.toJSONString(result));
+                pw.flush();
+                pw.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         }
     }
 

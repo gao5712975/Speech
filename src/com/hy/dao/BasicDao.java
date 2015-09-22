@@ -26,73 +26,49 @@ public class BasicDao {
     private ResultSet result = null;
     private PreparedStatement pre = null;
 
-    private Connection getConnection() {
-        if (connection == null) {
-            try {
-                connection = dataSource.getConnection();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return connection;
-    }
-
-    public List<Speech> find(String id) {
+    public List<Speech> find(String id) throws SQLException {
         List<Speech> list = new ArrayList<Speech>();
         String sql = "select * from v_boyin_keyunzhan where 1=1 ";
-//        company_id = 'f9a8fa794de86ecb014df0cf3b43065c'
 
         if (id != null && id.trim() != "") {
-            sql += " and company_id = '"+ id +"'";
+            sql += " and company_id = '" + id + "'";
         }
 
-        try {
-            Connection con = this.getConnection();
-            PreparedStatement pre = con.prepareStatement(sql);
-            ResultSet result = pre.executeQuery();
-            while (result.next()) {
-                Speech s = new Speech();
-                s.setId(result.getString("ID"));
-                s.setTime(result.getString("发车时间"));
-                s.setCarNumber(result.getString("车次"));
-                s.setTerminus(result.getString("终点站"));
-                s.setCheckport(result.getString("CHECKPORT"));
-                s.setCarType(result.getString("车型"));
-                s.setCarUnit(result.getString("车属单位"));
-//                s.setTime(result.getString("depart_time"));
-//                s.setCarNumber(result.getString("bus_code"));
-//                s.setTerminus(result.getString("depot_name"));
-//                s.setCheckport(result.getString("ticketgate_name"));
-//                s.setCarType(result.getString("BUSTYPE_NAME"));
-//                s.setCarUnit(result.getString("buscompany_name"));
-                list.add(s);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (connection == null) {
+            connection = dataSource.getConnection();
+        }
+        PreparedStatement pre = connection.prepareStatement(sql);
+        ResultSet result = pre.executeQuery();
+        while (result.next()) {
+            Speech s = new Speech();
+            s.setId(result.getString("ID"));
+            s.setTime(result.getString("发车时间"));
+            s.setCarNumber(result.getString("车次"));
+            s.setTerminus(result.getString("终点站"));
+            s.setCheckport(result.getString("CHECKPORT"));
+            s.setCarType(result.getString("车型"));
+            s.setCarUnit(result.getString("车属单位"));
+            list.add(s);
         }
         return list;
     }
 
-    public String login(String user,String password){
-        System.out.println(user);
+    public String login(String user, String password) throws SQLException {
         String sql = "select company_id ID from t_akf_member where 1=1 ";
-        sql += "and  login_name='"+ user+"' and login_password='"+ TripleDes.encrypt(password, null)+"'";
+        sql += "and  login_name='" + user + "' and login_password='" + TripleDes.encrypt(password, null) + "'";
         String id = "";
         System.out.println(sql);
-        try{
-            Connection con = this.getConnection();
-            PreparedStatement pre = con.prepareStatement(sql);
-            System.out.println(TripleDes.decrypt("E24F6954DC441B34", null));
-            System.out.println(TripleDes.encrypt(password, null));
-            ResultSet result = pre.executeQuery();
-            while (result.next()) {
-                id = result.getString("ID");
-                System.out.println("id:"+id);
-            }
-        }catch(SQLException e){
-            e.printStackTrace();
+        if (connection == null) {
+            connection = dataSource.getConnection();
         }
-
+        PreparedStatement pre = connection.prepareStatement(sql);
+        System.out.println(TripleDes.decrypt("E24F6954DC441B34", null));
+        System.out.println(TripleDes.encrypt(password, null));
+        ResultSet result = pre.executeQuery();
+        while (result.next()) {
+            id = result.getString("ID");
+            System.out.println("id:" + id);
+        }
         return id;
     }
 }

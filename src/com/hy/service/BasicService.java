@@ -6,6 +6,7 @@ import com.hy.model.Speech;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -16,11 +17,11 @@ public class BasicService {
     @Autowired
     private BasicDao basicDao;
 
-    public List<Speech> find(String id){
+    public List<Speech> find(String id)throws SQLException{
         return basicDao.find(id);
     }
 
-    public String login(String user,String password){
+    public String login(String user,String password)throws SQLException{
         return basicDao.login(user,password);
     }
 }
