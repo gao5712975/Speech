@@ -6,14 +6,14 @@
        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
 
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
-        <!--<property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
         <property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.2.241:1521:orcl250"/>
         <property name="user" value="TPRISCAS"/>
-        <property name="password" value="TPRISCAS"/>-->
-        <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="password" value="TPRISCAS"/>
+        <!--<property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
         <property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.1.204:1521:orcl"/>
         <property name="user" value="priscom"/>
-        <property name="password" value="priscom"/>
+        <property name="password" value="priscom"/>-->
         <!-- c3p0连接池配置 -->
         <!-- 获取connnection时测试是否有效  -->
         <property name="testConnectionOnCheckin" value="false"/>

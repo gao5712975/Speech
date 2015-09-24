@@ -102,6 +102,7 @@ public class SpeechsController {
 
     @RequestMapping("speechPlay")
     public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech) {
+        System.out.println(speech);
         try {
             if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
@@ -117,7 +118,13 @@ public class SpeechsController {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             JSONObject result = new JSONObject();
-            int a = this.engineProxy.play(speech);
+            int a;
+            System.out.println(isMessyCode(speech));
+            if (isMessyCode(speech)) {
+                a = this.engineProxy.play("输入有误");
+            } else {
+                a = this.engineProxy.play(speech);
+            }
             System.out.println(a);
             result.put("status", status);
             e.write(result.toJSONString());
@@ -126,7 +133,6 @@ public class SpeechsController {
         } catch (IOException var6) {
             var6.printStackTrace();
         }
-
     }
 
     @RequestMapping("stop")
@@ -159,15 +165,9 @@ public class SpeechsController {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
             if (this.engineProxy != null) {
-                String task = "尊敬的旅客，去往终点站、" + speechBus.getTerminus() + "、班次为" + this.numberOfString(speechBus.getCarNumber()) + "号的汽车、将在" + speechBus.getTime() + "准时发车，请旅客们提前做好准备，谢谢";
-                System.out.println(task);
-                if (speechBus.getRulePlay() != null && !"".equals(speechBus.getRulePlay().trim())) {
-                    task = speechBus.getRulePlay();
-                    System.out.println(task);
-                }
                 for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
                     if (engineProxy != null) {
-                        this.engineProxy.play(task);
+                        this.engineProxy.play(speechBus.getRulePlay());
                     } else {
                         break;
                     }
@@ -188,55 +188,11 @@ public class SpeechsController {
 
     }
 
-    public String numberOfString(String number) {
-        char[] s = number.toCharArray();
-        String nu = "";
-        for (int i = 0, j = s.length; i < j; i++) {
-            switch (s[i]) {
-                case '0':
-                    nu += "零";
-                    break;
-                case '1':
-                    nu += "一";
-                    break;
-                case '2':
-                    nu += "二";
-                    break;
-                case '3':
-                    nu += "三";
-                    break;
-                case '4':
-                    nu += "四";
-                    break;
-                case '5':
-                    nu += "五";
-                    break;
-                case '6':
-                    nu += "六";
-                    break;
-                case '7':
-                    nu += "七";
-                    break;
-                case '8':
-                    nu += "八";
-                    break;
-                case '9':
-                    nu += "九";
-                    break;
-                default:
-                    nu += s[i];
-                    break;
-            }
-        }
-        return nu;
-    }
-
     @RequestMapping("initEngineProxy")
     public void initEngineProxy(@RequestParam("type") String type, HttpServletResponse response) {
         if (this.engineProxy == null) {
             this.engineProxy = this.getEngine();
         }
-
         try {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
@@ -270,6 +226,7 @@ public class SpeechsController {
                 json = JSON.toJSONString(list);
                 result.put("status", "01");//正确结果
                 result.put("result", json);
+                System.out.println("有数据");
                 pw.write(JSON.toJSONString(result));
                 pw.flush();
                 pw.close();
@@ -290,12 +247,30 @@ public class SpeechsController {
 
     public int findArrayIndex(String[] str, String timber) {
         int i = 0;
-
         for (int j = str.length; i < j; ++i) {
             if (str[i].equals(timber)) {
                 return i;
             }
         }
         return 0;
+    }
+
+    /**
+     * 判断是否为乱码
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isMessyCode(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 当从Unicode编码向某个字符集转换时，如果在该字符集中没有对应的编码，则得到0x3f（即问号字符?）
+            //从其他字符集向Unicode编码转换时，如果这个二进制数在该字符集中没有标识任何的字符，则得到的结果是0xfffd
+            //System.out.println("--- " + (int) c);
+            if ((int) c == 0xfffd) {
+                return true;
+            }
+        }
+        return false;
     }
 }
