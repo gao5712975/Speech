@@ -103,29 +103,16 @@ public class SpeechsController {
     @RequestMapping("speechPlay")
     public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech) {
         System.out.println(speech);
+        response.setHeader("Content-Type", "text/html;charset=UTF-8");
+        JSONObject result = new JSONObject();
         try {
             if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
             }
-            //播放状态
-            if (status == -1) {
-                status = 1;
-            }
-            if (status == 0) {
-                status = 2;
-            }
-            this.engineProxy.stop();
-            response.setHeader("Content-Type", "text/html;charset=UTF-8");
+            status = 0;
             PrintWriter e = response.getWriter();
-            JSONObject result = new JSONObject();
-            int a;
-            System.out.println(isMessyCode(speech));
-            if (isMessyCode(speech)) {
-                a = this.engineProxy.play("输入有误");
-            } else {
-                a = this.engineProxy.play(speech);
-            }
-            System.out.println(a);
+            System.out.println(status);
+            this.engineProxy.play(speech);
             result.put("status", status);
             e.write(result.toJSONString());
             e.flush();
@@ -139,70 +126,17 @@ public class SpeechsController {
     public void stop(HttpServletResponse response) {
         try {
             PrintWriter e = response.getWriter();
+            JSONObject result = new JSONObject();
             if (this.engineProxy != null) {
                 System.out.println(this.engineProxy.stop());
-                status = -1;
-                this.engineProxy = null;
-                e.write("任务结束");
-                e.flush();
-                e.close();
-            } else {
-                e.write("没有任务");
-                e.flush();
-                e.close();
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-
-    }
-
-    @RequestMapping("play")
-    public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
-        try {
-            status = 0;
-            System.out.println("开始");
-            response.setHeader("Content-Type", "text/html;charset=UTF-8");
-            PrintWriter e = response.getWriter();
-            if (this.engineProxy != null) {
-                for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
-                    if (engineProxy != null) {
-                        this.engineProxy.play(speechBus.getRulePlay());
-                    } else {
-                        break;
-                    }
-                }
-                JSONObject var8 = new JSONObject();
-                System.out.println("完毕");
-                var8.put("id", speechBus.getId());
-                var8.put("status", status);
-                e.write(var8.toJSONString());
-                e.flush();
-                e.close();
-            } else {
-                response.setStatus(500);
-            }
-        } catch (IOException var7) {
-            var7.printStackTrace();
-        }
-
-    }
-
-    @RequestMapping("initEngineProxy")
-    public void initEngineProxy(@RequestParam("type") String type, HttpServletResponse response) {
-        if (this.engineProxy == null) {
-            this.engineProxy = this.getEngine();
-        }
-        try {
-            response.setHeader("Content-Type", "text/html;charset=UTF-8");
-            PrintWriter e = response.getWriter();
-            JSONObject result = new JSONObject();
-            result.put("type", type);
+            status = 1;
+            result.put("status", status);
             e.write(result.toJSONString());
             e.flush();
             e.close();
-        } catch (IOException var5) {
-            var5.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
 
     }
@@ -253,24 +187,5 @@ public class SpeechsController {
             }
         }
         return 0;
-    }
-
-    /**
-     * 判断是否为乱码
-     *
-     * @param str
-     * @return
-     */
-    public static boolean isMessyCode(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            // 当从Unicode编码向某个字符集转换时，如果在该字符集中没有对应的编码，则得到0x3f（即问号字符?）
-            //从其他字符集向Unicode编码转换时，如果这个二进制数在该字符集中没有标识任何的字符，则得到的结果是0xfffd
-            //System.out.println("--- " + (int) c);
-            if ((int) c == 0xfffd) {
-                return true;
-            }
-        }
-        return false;
     }
 }
