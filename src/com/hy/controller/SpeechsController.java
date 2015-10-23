@@ -1,7 +1,10 @@
 package com.hy.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.hy.model.Speech;
 import com.hy.model.SpeechBus;
 import com.hy.service.BasicService;
 import com.okvoice.tts.TTSEngine;
@@ -26,7 +29,7 @@ public class SpeechsController {
     private BasicService basicService;
     private TTSEngine engine = null;
     private TTSEngine engineProxy = null;
-    private int status = -1; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
+    private int status = 1; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
 
     public SpeechsController() {
     }
@@ -101,7 +104,7 @@ public class SpeechsController {
     }
 
     @RequestMapping("speechPlay")
-    public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech) {
+    public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech, @RequestParam("taskNumber") String taskNumber) {
         System.out.println(speech);
         response.setHeader("Content-Type", "text/html;charset=UTF-8");
         JSONObject result = new JSONObject();
@@ -109,10 +112,18 @@ public class SpeechsController {
             if (this.engineProxy == null) {
                 this.engineProxy = this.getEngine();
             }
-            status = 0;
+            status = 0 ;
             PrintWriter e = response.getWriter();
+
+            for (int i = 0; i < Integer.valueOf(taskNumber); ++i) {
+                if (engineProxy != null) {
+                    this.engineProxy.play(speech);
+                } else {
+                    break;
+                }
+            }
+
             System.out.println(status);
-            this.engineProxy.play(speech);
             result.put("status", status);
             e.write(result.toJSONString());
             e.flush();
@@ -128,15 +139,66 @@ public class SpeechsController {
             PrintWriter e = response.getWriter();
             JSONObject result = new JSONObject();
             if (this.engineProxy != null) {
-                System.out.println(this.engineProxy.stop());
+                this.engineProxy.stop();
+                status = 1;
+                this.engineProxy = null;
             }
-            status = 1;
             result.put("status", status);
             e.write(result.toJSONString());
             e.flush();
             e.close();
         } catch (IOException e1) {
             e1.printStackTrace();
+        }
+
+    }
+
+    @RequestMapping("play")
+    public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
+        try {
+            status = 0;
+            System.out.println("开始");
+            response.setHeader("Content-Type", "text/html;charset=UTF-8");
+            PrintWriter e = response.getWriter();
+            if (this.engineProxy != null) {
+                for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
+                    if (engineProxy != null) {
+                        this.engineProxy.play(speechBus.getRulePlay());
+                    } else {
+                        break;
+                    }
+                }
+                JSONObject var8 = new JSONObject();
+                System.out.println("完毕");
+                var8.put("id", speechBus.getId());
+                var8.put("status", status);
+                e.write(var8.toJSONString());
+                e.flush();
+                e.close();
+            } else {
+                response.setStatus(500);
+            }
+        } catch (IOException var7) {
+            var7.printStackTrace();
+        }
+
+    }
+
+    @RequestMapping("initEngineProxy")
+    public void initEngineProxy(@RequestParam("type") String type, HttpServletResponse response) {
+        if (this.engineProxy == null) {
+            this.engineProxy = this.getEngine();
+        }
+        try {
+            response.setHeader("Content-Type", "text/html;charset=UTF-8");
+            PrintWriter e = response.getWriter();
+            JSONObject result = new JSONObject();
+            result.put("type", type);
+            e.write(result.toJSONString());
+            e.flush();
+            e.close();
+        } catch (IOException var5) {
+            var5.printStackTrace();
         }
 
     }
@@ -156,11 +218,10 @@ public class SpeechsController {
                 pw.flush();
                 pw.close();
             } else {
-                List list = this.basicService.find(id);
-                json = JSON.toJSONString(list);
+                List<Speech> list = this.basicService.find(id);
                 result.put("status", "01");//正确结果
-                result.put("result", json);
-                System.out.println("有数据");
+                result.put("result", list);
+                System.out.println("有数据!");
                 pw.write(JSON.toJSONString(result));
                 pw.flush();
                 pw.close();
@@ -187,5 +248,24 @@ public class SpeechsController {
             }
         }
         return 0;
+    }
+
+    /**
+     * 判断是否为乱码
+     *
+     * @param str
+     * @return
+     */
+    public static boolean isMessyCode(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            // 当从Unicode编码向某个字符集转换时，如果在该字符集中没有对应的编码，则得到0x3f（即问号字符?）
+            //从其他字符集向Unicode编码转换时，如果这个二进制数在该字符集中没有标识任何的字符，则得到的结果是0xfffd
+            //System.out.println("--- " + (int) c);
+            if ((int) c == 0xfffd) {
+                return true;
+            }
+        }
+        return false;
     }
 }

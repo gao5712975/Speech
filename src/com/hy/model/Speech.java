@@ -2,14 +2,14 @@ package com.hy.model;
 
 import java.io.Serializable;
 
-public class Speech implements Serializable {
+public class Speech implements Serializable{
     private String id;
     private String time;
     private String carNumber;
     private String terminus;
-    private String checkport;
     private String carType;
     private String carUnit;
+    private String platformNo;
 
     public Speech() {
     }
@@ -46,14 +46,6 @@ public class Speech implements Serializable {
         this.terminus = terminus;
     }
 
-    public String getCheckport() {
-        return this.checkport;
-    }
-
-    public void setCheckport(String checkport) {
-        this.checkport = checkport;
-    }
-
     public String getCarType() {
         return this.carType;
     }
@@ -68,5 +60,13 @@ public class Speech implements Serializable {
 
     public void setCarUnit(String carUnit) {
         this.carUnit = carUnit;
+    }
+
+    public String getPlatformNo() {
+        return platformNo;
+    }
+
+    public void setPlatformNo(String platformNo) {
+        this.platformNo = platformNo;
     }
 }

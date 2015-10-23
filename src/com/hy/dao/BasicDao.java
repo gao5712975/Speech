@@ -28,7 +28,7 @@ public class BasicDao {
 
     public List<Speech> find(String id) throws SQLException {
         List<Speech> list = new ArrayList<Speech>();
-        String sql = "select * from v_boyin_keyunzhan where 1=1 ";
+        String sql = "select * from v_boyin where 1=1 ";
 
         if (id != null && id.trim() != "") {
             sql += " and company_id = '" + id + "'";
@@ -42,12 +42,12 @@ public class BasicDao {
         while (result.next()) {
             Speech s = new Speech();
             s.setId(result.getString("ID"));
-            s.setTime(result.getString("发车时间"));
-            s.setCarNumber(result.getString("车次"));
-            s.setTerminus(result.getString("终点站"));
-            s.setCheckport(result.getString("CHECKPORT"));
-            s.setCarType(result.getString("车型"));
-            s.setCarUnit(result.getString("车属单位"));
+            s.setTime(result.getString("发车时间") == null ? "" : result.getString("发车时间"));
+            s.setCarNumber(result.getString("车次") == null ? "" : result.getString("车次"));
+            s.setTerminus(result.getString("终点站") == null ? "" : result.getString("终点站"));
+            s.setCarType(result.getString("车型") == null ? "" : result.getString("车型"));
+            s.setCarUnit(result.getString("车属单位") == null ? "" : result.getString("车属单位"));
+            s.setPlatformNo(result.getString("站台号") == null ? "" : result.getString("站台号"));
             list.add(s);
         }
         return list;
@@ -62,8 +62,6 @@ public class BasicDao {
             connection = dataSource.getConnection();
         }
         PreparedStatement pre = connection.prepareStatement(sql);
-        System.out.println(TripleDes.decrypt("E24F6954DC441B34", null));
-        System.out.println(TripleDes.encrypt(password, null));
         ResultSet result = pre.executeQuery();
         while (result.next()) {
             id = result.getString("ID");

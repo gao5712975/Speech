@@ -1,5 +1,11 @@
 package com.hy.model;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SpeechBus {
     private String time;
     private String id;
