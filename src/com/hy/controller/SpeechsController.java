@@ -27,7 +27,7 @@ public class SpeechsController {
     @Autowired
     private BasicService basicService;
     private TTSEngine engineProxy = null;
-    private int status = 1; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
+    private int status = 0; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
 
     public SpeechsController() {
     }
@@ -54,7 +54,9 @@ public class SpeechsController {
         }
         try {
             PrintWriter e = response.getWriter();
-            e.write("0");
+            JSONObject result = new JSONObject();
+            result.put("status", 0);
+            e.write(JSON.toJSONString(result));
             e.flush();
             e.close();
         } catch (IOException var6) {
@@ -101,7 +103,6 @@ public class SpeechsController {
             PrintWriter e = response.getWriter();
             JSONObject result = new JSONObject();
             this.getEngine().stop();
-            this.engineProxy = null;
             result.put("status", 3);
             e.write(result.toJSONString());
             e.flush();
@@ -112,37 +113,43 @@ public class SpeechsController {
     }
 
     private List<TTSEngine> list = new ArrayList<TTSEngine>();
+
     @RequestMapping("play")
-    public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
+    public void play(@RequestParam String speech, @RequestParam int taskNumber, HttpServletResponse response) {
         try {
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
-            if (this.engineProxy == null) {
-                this.engineProxy = this.getEngine();
-            }
             list.add(engineProxy);
-            for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
-                if (engineProxy != null) {
-                    this.engineProxy.play(speechBus.getRulePlay());
+            this.getEngine().stop();
+            status = 3;
+            synchronized (engineProxy){
+                status = 0;
+                for (int result = 0; result < taskNumber; ++result) {
+                    if (engineProxy != null && status != 3) {
+                        this.getEngine().play(speech);
+                    } else {
+                        break;
+                    }
+                }
+                if (list.size() > 1) {
+                    status = 1;
                 } else {
-                    break;
+                    if (status != 3) {//如果点击停止按钮就不把状态改为0；
+                        status = 0;
+                    }
                 }
-            }
-            if(list.size()>1){
-                status = 1;
-            }else{
-                if(status != 3){//如果点击停止按钮就不把状态改为0；
-                    status = 0;
+                list.remove(list.size() - 1);
+                JSONObject var8 = new JSONObject();
+                if (status == 3) {
+                    var8.put("status", 1);
+                } else {
+                    var8.put("status", status);
                 }
+                status = 0;
+                e.write(var8.toJSONString());
+                e.flush();
+                e.close();
             }
-            list.remove(list.size()-1);
-            JSONObject var8 = new JSONObject();
-            System.out.println("完毕");
-            var8.put("id", speechBus.getId());
-            var8.put("status", status);
-            e.write(var8.toJSONString());
-            e.flush();
-            e.close();
         } catch (IOException var7) {
             var7.printStackTrace();
         }
@@ -175,7 +182,7 @@ public class SpeechsController {
                 e1.printStackTrace();
             }
             e.printStackTrace();
-        }finally {
+        } finally {
             pw.flush();
             pw.close();
         }
