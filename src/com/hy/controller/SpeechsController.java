@@ -1,9 +1,7 @@
 package com.hy.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.hy.model.Speech;
 import com.hy.model.SpeechBus;
 import com.hy.service.BasicService;
@@ -19,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,7 +26,6 @@ public class SpeechsController {
     private static final String[] langModeDesc = new String[]{"普通话男声", "普通话女声", "粤语男声", "粤语女声", "英语男声", "英语女声", "中英混合男", "中英混合女声", "粤英混合男声", "粤英混合声"};
     @Autowired
     private BasicService basicService;
-    private TTSEngine engine = null;
     private TTSEngine engineProxy = null;
     private int status = 1; //0开始读，1插播被停止，播报被停止，2插播状态，播报等待，
 
@@ -35,11 +33,10 @@ public class SpeechsController {
     }
 
     public TTSEngine getEngine() {
-        if (this.engine == null) {
-            this.engine = (TTSEngine) ApplicationContextHelper.getBean("engine");
+        if (this.engineProxy == null) {
+            this.engineProxy = (TTSEngine) ApplicationContextHelper.getBean("engine");
         }
-
-        return this.engine;
+        return this.engineProxy;
     }
 
     @RequestMapping({"speechConfig"})
@@ -53,219 +50,134 @@ public class SpeechsController {
         }
 
         if (timbre != null && "".equals(timbre.trim())) {
-            this.getEngine().setLangMode(this.findArrayIndex(langModeDesc, timbre));
+            this.getEngine().setLangMode(Integer.valueOf(timbre).intValue());
         }
-
         try {
             PrintWriter e = response.getWriter();
-            e.write("01");
+            e.write("0");
             e.flush();
             e.close();
         } catch (IOException var6) {
             var6.printStackTrace();
         }
-
     }
 
     @RequestMapping("login")
-    public void login(HttpServletRequest request, HttpServletResponse response, @RequestParam("user") String user, @RequestParam("password") String password) {
-        PrintWriter pw;
+    public void login(HttpServletResponse response, @RequestParam("user") String user, @RequestParam("password") String password) {
+        PrintWriter pw = null;
         JSONObject result = new JSONObject();
         try {
             String id = basicService.login(user, password);
             System.out.println(id);
             pw = response.getWriter();
             if ("".equals(id)) {
-                result.put("status", "00");
+                result.put("status", 1);
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             } else {
-                result.put("status", "01");
+                result.put("status", 0);
                 result.put("id", id);
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             try {
                 pw = response.getWriter();
-                result.put("status", "02");
+                result.put("status", 2);
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        } finally {
+            pw.flush();
+            pw.close();
         }
 
-    }
-
-    @RequestMapping("speechPlay")
-    public void speechPlay(HttpServletRequest request, HttpServletResponse response, @RequestParam("speech") String speech, @RequestParam("taskNumber") String taskNumber) {
-        System.out.println(speech);
-        response.setHeader("Content-Type", "text/html;charset=UTF-8");
-        JSONObject result = new JSONObject();
-        try {
-            if (this.engineProxy == null) {
-                this.engineProxy = this.getEngine();
-            }
-            status = 0 ;
-            PrintWriter e = response.getWriter();
-
-            for (int i = 0; i < Integer.valueOf(taskNumber); ++i) {
-                if (engineProxy != null) {
-                    this.engineProxy.play(speech);
-                } else {
-                    break;
-                }
-            }
-
-            System.out.println(status);
-            result.put("status", status);
-            e.write(result.toJSONString());
-            e.flush();
-            e.close();
-        } catch (IOException var6) {
-            var6.printStackTrace();
-        }
     }
 
     @RequestMapping("stop")
     public void stop(HttpServletResponse response) {
         try {
+            status = 3;
             PrintWriter e = response.getWriter();
             JSONObject result = new JSONObject();
-            if (this.engineProxy != null) {
-                this.engineProxy.stop();
-                status = 1;
-                this.engineProxy = null;
-            }
-            result.put("status", status);
+            this.getEngine().stop();
+            this.engineProxy = null;
+            result.put("status", 3);
             e.write(result.toJSONString());
             e.flush();
             e.close();
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
     }
 
+    private List<TTSEngine> list = new ArrayList<TTSEngine>();
     @RequestMapping("play")
     public void play(@ModelAttribute SpeechBus speechBus, HttpServletResponse response) {
         try {
-            status = 0;
-            System.out.println("开始");
             response.setHeader("Content-Type", "text/html;charset=UTF-8");
             PrintWriter e = response.getWriter();
-            if (this.engineProxy != null) {
-                for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
-                    if (engineProxy != null) {
-                        this.engineProxy.play(speechBus.getRulePlay());
-                    } else {
-                        break;
-                    }
-                }
-                JSONObject var8 = new JSONObject();
-                System.out.println("完毕");
-                var8.put("id", speechBus.getId());
-                var8.put("status", status);
-                e.write(var8.toJSONString());
-                e.flush();
-                e.close();
-            } else {
-                response.setStatus(500);
+            if (this.engineProxy == null) {
+                this.engineProxy = this.getEngine();
             }
+            list.add(engineProxy);
+            for (int result = 0; result < Integer.valueOf(speechBus.getTaskNumber()); ++result) {
+                if (engineProxy != null) {
+                    this.engineProxy.play(speechBus.getRulePlay());
+                } else {
+                    break;
+                }
+            }
+            if(list.size()>1){
+                status = 1;
+            }else{
+                if(status != 3){//如果点击停止按钮就不把状态改为0；
+                    status = 0;
+                }
+            }
+            list.remove(list.size()-1);
+            JSONObject var8 = new JSONObject();
+            System.out.println("完毕");
+            var8.put("id", speechBus.getId());
+            var8.put("status", status);
+            e.write(var8.toJSONString());
+            e.flush();
+            e.close();
         } catch (IOException var7) {
             var7.printStackTrace();
         }
-
-    }
-
-    @RequestMapping("initEngineProxy")
-    public void initEngineProxy(@RequestParam("type") String type, HttpServletResponse response) {
-        if (this.engineProxy == null) {
-            this.engineProxy = this.getEngine();
-        }
-        try {
-            response.setHeader("Content-Type", "text/html;charset=UTF-8");
-            PrintWriter e = response.getWriter();
-            JSONObject result = new JSONObject();
-            result.put("type", type);
-            e.write(result.toJSONString());
-            e.flush();
-            e.close();
-        } catch (IOException var5) {
-            var5.printStackTrace();
-        }
-
     }
 
     @RequestMapping({"findDataList"})
-    public void findSpeedList(HttpServletRequest request, HttpServletResponse response, @RequestParam("id") String id) {
-        PrintWriter pw;
+    public void findSpeedList(HttpServletResponse response, @RequestParam("id") String id) {
+        PrintWriter pw = null;
         JSONObject result = new JSONObject();
         response.setHeader("Content-Type", "text/html;charset=UTF-8");
         try {
             pw = response.getWriter();
             System.out.println("id:" + id);
-            String json;
             if (id == null || "".equals(id)) {
-                result.put("status", "00");//没有登录，或者用户没有车站信息
+                result.put("status", "1");//没有登录，或者用户没有车站信息
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             } else {
                 List<Speech> list = this.basicService.find(id);
-                result.put("status", "01");//正确结果
+                result.put("status", "0");//正确结果
                 result.put("result", list);
                 System.out.println("有数据!");
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             }
         } catch (Exception e) {
             try {
                 pw = response.getWriter();
-                result.put("status", "02");//系统错误
+                result.put("status", "2");//系统错误
                 pw.write(JSON.toJSONString(result));
-                pw.flush();
-                pw.close();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
             e.printStackTrace();
+        }finally {
+            pw.flush();
+            pw.close();
         }
-    }
-
-    public int findArrayIndex(String[] str, String timber) {
-        int i = 0;
-        for (int j = str.length; i < j; ++i) {
-            if (str[i].equals(timber)) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * 判断是否为乱码
-     *
-     * @param str
-     * @return
-     */
-    public static boolean isMessyCode(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            // 当从Unicode编码向某个字符集转换时，如果在该字符集中没有对应的编码，则得到0x3f（即问号字符?）
-            //从其他字符集向Unicode编码转换时，如果这个二进制数在该字符集中没有标识任何的字符，则得到的结果是0xfffd
-            //System.out.println("--- " + (int) c);
-            if ((int) c == 0xfffd) {
-                return true;
-            }
-        }
-        return false;
     }
 }

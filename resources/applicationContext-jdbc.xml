@@ -15,9 +15,9 @@
         <property name="user" value="priscom"/>
         <property name="password" value="priscom"/>-->
         <property name="driverClass" value="oracle.jdbc.driver.OracleDriver"/>
-        <property name="jdbcUrl" value="jdbc:oracle:thin:@192.168.2.241:1521/orcl250"/>
-        <property name="user" value="TPRISCAS"/>
-        <property name="password" value="TPRISCAS"/>
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@(description=(address=(protocol=tcp)(port=1521)(host=192.168.2.108))(connect_data=(service_name=orcl)))"/>
+        <property name="user" value="xrpriscas"/>
+        <property name="password" value="xrpriscas"/>
         <!-- c3p0连接池配置 -->
         <!-- 获取connnection时测试是否有效  -->
         <!--<property name="testConnectionOnCheckin" value="false"/>-->

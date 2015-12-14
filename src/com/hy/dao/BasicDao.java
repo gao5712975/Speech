@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ *
  * Created by Yuan on 2015/9/2.
  */
 @Repository("basicDao")
@@ -57,7 +58,6 @@ public class BasicDao {
         String sql = "select company_id ID from t_akf_member where 1=1 ";
         sql += "and  login_name='" + user + "' and login_password='" + TripleDes.encrypt(password, null) + "'";
         String id = "";
-        System.out.println(sql);
         if (connection == null) {
             connection = dataSource.getConnection();
         }
@@ -65,7 +65,6 @@ public class BasicDao {
         ResultSet result = pre.executeQuery();
         while (result.next()) {
             id = result.getString("ID");
-            System.out.println("id:" + id);
         }
         return id;
     }
