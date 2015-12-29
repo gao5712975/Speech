@@ -25,7 +25,7 @@
         <module name="Speech" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.6">
+    <bytecodeTargetLevel>
       <module name="Speech" target="1.7" />
     </bytecodeTargetLevel>
   </component>
